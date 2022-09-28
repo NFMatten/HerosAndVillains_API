@@ -10,7 +10,11 @@ from Super import serializers
 def supers_list(request):
 
     if request.method == 'GET':
+        type_param = request.query_params.get('type')
         supers = Super.objects.all()
+        if type_param:
+            supers = supers.filter(super_type__type=type_param)
+
         serializer = SuperSerializer(supers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -38,16 +42,3 @@ def super_detail(request, pk):
     elif request.method == 'DELETE':
         super.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-# WIP: filter by query params
-@api_view(['GET'])
-def filtered_list(request):
-    type_param = request.query_params.get('type')
-
-    supers = Super.objects.all()
-
-    if type_param:
-        supers = supers.filter(super_type__type=type_param)
-    
-    serializer = SuperSerializer(supers, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
